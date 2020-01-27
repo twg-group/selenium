@@ -1,4 +1,4 @@
-## Selenium Servlets
+## Selenium servlets
  
 _IntelliJ IDEA mvn project as example, included in repo_
  
