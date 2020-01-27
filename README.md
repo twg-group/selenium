@@ -9,13 +9,13 @@ _IntelliJ IDEA mvn project as example, included in repo_
 
 _for windows:_
 ```
-java -cp "Selenium-1.0-SNAPSHOT.jar;selenium-server-standalone-3.141.59.jar" org.openqa.grid.selenium.GridLauncherV3 -role hub -servlets servlet.nodes
+java -cp "selenium-1.0-SNAPSHOT.jar;selenium-server-standalone-3.141.59.jar" org.openqa.grid.selenium.GridLauncherV3 -role hub -servlets servlet.nodes
 ```
 _for linux:_
 ```
-java -cp "Selenium-1.0-SNAPSHOT.jar:selenium-server-standalone-3.141.59.jar" org.openqa.grid.selenium.GridLauncherV3 -role hub -servlets servlet.nodes
+java -cp selenium-1.0-SNAPSHOT.jar:selenium-server-standalone-3.141.59.jar org.openqa.grid.selenium.GridLauncherV3 -role hub -servlets servlet.nodes
 ```
 _attach node to hub (port optional):_
 ```
-java -jar selenium-server-standalone-3.141.59.jar -role node -hub http://localhost:4444/grid/register -port=5566
+java -jar selenium-server-standalone-3.141.59.jar -role node -hub http://localhost:4444/grid/register -port 5566
 ```
