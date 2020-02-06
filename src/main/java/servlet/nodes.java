@@ -3,7 +3,6 @@ package servlet;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.json.JSONTokener;
 import org.openqa.grid.common.exception.GridException;
 import org.openqa.grid.internal.GridRegistry;
 import org.openqa.grid.internal.ProxySet;
@@ -13,7 +12,8 @@ import org.openqa.grid.web.servlet.RegistryBasedServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Nodes Servlet for Selenium grid 3.141.59
@@ -105,44 +105,31 @@ public class nodes extends RegistryBasedServlet {
      */
     private JSONArray getNodes(ProxySet proxies) {
         JSONArray array = new JSONArray();
+
+        List<Thread> threads = new ArrayList<>();
+        List<NodeInfoTask> tasks = new ArrayList<>();
+
         for (RemoteProxy proxy : proxies) {
-            JSONObject proxyJson = new JSONObject();
-
-            URL remoteHost = proxy.getRemoteHost();
-            String nodeUrl = remoteHost.toString();
-
-            proxyJson.put("url", nodeUrl);
-            proxyJson.put("host", remoteHost.getHost());
-            proxyJson.put("port", remoteHost.getPort());
-            proxyJson.put("sessions", getNodeSessions(nodeUrl));
-
-            array.put(proxyJson);
+            tasks.add(new NodeInfoTask(proxy));
+            Thread worker = new Thread(tasks.get(tasks.size() - 1));
+            worker.start();
+            threads.add(worker);
         }
-        return array;
-    }
-
-    /**
-     * @param nodeUrl String
-     * @return JSONArray
-     */
-    private JSONArray getNodeSessions(String nodeUrl) {
-        JSONArray sessions = new JSONArray();
-        JSONTokener tokener;
-        try {
-            tokener = new JSONTokener(new URL(nodeUrl + "/wd/hub/sessions").openStream());
-        } catch (IOException e) {
-            return sessions;
-        }
-
-        JSONObject data = new JSONObject(tokener);
-        if (data.length() > 0) {
-            JSONArray array = data.getJSONArray("value");
-            for (Object obj : array) {
-                if (obj instanceof JSONObject) {
-                    sessions.put(((JSONObject) obj).get("id"));
+        boolean running;
+        do {
+            running = false;
+            for (Thread thread : threads) {
+                if (thread.isAlive()) {
+                    running = true;
+                    break;
                 }
             }
+        } while (running);
+
+        for (NodeInfoTask task : tasks) {
+            array.put(task.getJson());
         }
-        return sessions;
+
+        return array;
     }
 }
