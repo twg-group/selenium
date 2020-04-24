@@ -1,7 +1,5 @@
 ## Selenium servlets
  
-_IntelliJ IDEA mvn project as example, included in repo_
- 
 ###### Launching selenium hub with servlet 
 
  * Nodes Servlet for Selenium grid 3.141.59
